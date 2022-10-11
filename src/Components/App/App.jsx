@@ -33,16 +33,17 @@ class App extends Component {
   addImageQuery = imageQuerySearchbar => {
     this.setState({
       imageQuery: imageQuerySearchbar,
+      page: 1,
     });
 
     console.log('imageQuerySearchbar: ', imageQuerySearchbar);
   };
 
-  fetchImagesData() {
+  async fetchImagesData() {
     const { imageQuery, page } = this.state;
 
-    getImagesApi(imageQuery, page).then(images => {
-      console.log('images: ', images);
+    await getImagesApi(imageQuery, page).then(images => {
+      // console.log('images: ', images);
 
       if (page > 1) {
         this.setState(prevState => ({
@@ -66,8 +67,8 @@ class App extends Component {
   render() {
     const { imageArr, totalPage, page } = this.state;
 
-    console.log('new');
-    console.log(imageArr);
+    console.log('--------new!!!');
+    console.log('imageArr: ', imageArr);
     console.log('totalPage: ', totalPage);
     console.log('page: ', page);
 
