@@ -1,9 +1,9 @@
 import { Component } from 'react';
 import { ThreeDots } from 'react-loader-spinner';
 
+import getImagesApi from 'Services/Api';
 import Searchbar from 'Components/Searchbar/Searchbar';
 import Section from 'Components/Section/Section';
-import getImagesApi from 'Services/Api';
 import ImageGallery from 'Components/ImageGallery/ImageGallery';
 import Button from 'Components/Button/Button';
 import ModalImage from 'Components/ModalImage/ModalImage';
@@ -17,12 +17,6 @@ class App extends Component {
     loading: false,
     modal: null,
   };
-
-  shouldComponentUpdate(_, nextState) {
-    console.log('this.state.imageArr', this.state.imageArr);
-    console.log('nextState: ', nextState);
-    return true;
-  }
 
   componentDidUpdate(_, prevState) {
     const { imageQuery, page } = this.state;
@@ -45,8 +39,6 @@ class App extends Component {
       imageQuery: imageQuerySearchbar,
       page: 1,
     });
-
-    console.log('imageQuerySearchbar: ', imageQuerySearchbar);
   };
 
   fetchImagesData() {
@@ -58,8 +50,6 @@ class App extends Component {
 
     getImagesApi(imageQuery, page)
       .then(images => {
-        console.log('imagesFETCH: ', images);
-
         if (page > 1) {
           this.setState(prevState => ({
             imageArr: [...prevState.imageArr, ...images.hits],
@@ -71,6 +61,7 @@ class App extends Component {
           });
         }
       })
+      .catch(error => console.log(error.code))
       .finally(() => {
         this.setState({
           loading: false,
@@ -94,11 +85,6 @@ class App extends Component {
 
   render() {
     const { imageArr, totalPage, page, loading, modal } = this.state;
-
-    console.log('--------new!!!');
-    console.log('imageArr: ', imageArr);
-    console.log('totalPage: ', totalPage);
-    console.log('page: ', page);
 
     return (
       <>

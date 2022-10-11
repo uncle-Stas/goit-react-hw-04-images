@@ -1,4 +1,5 @@
 import css from './ModalImage.module.css';
+import PropTypes from 'prop-types';
 
 import { Component } from 'react';
 import { createPortal } from 'react-dom';
@@ -42,3 +43,11 @@ class ModalImage extends Component {
 }
 
 export default ModalImage;
+
+// --------------------------- PropTypes ----------------------
+
+ModalImage.propTypes = {
+  imageURL: PropTypes.string.isRequired,
+  imageAlt: PropTypes.string.isRequired,
+  closeModal: PropTypes.func.isRequired,
+};
