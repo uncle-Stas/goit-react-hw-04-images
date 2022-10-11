@@ -2,57 +2,85 @@ import { Component } from 'react';
 
 import Searchbar from 'Components/Searchbar/Searchbar';
 import Section from 'Components/Section/Section';
-import getImages from 'Components/Services/Api';
+import getImagesApi from 'Components/Services/Api';
+import ImageGallery from 'Components/ImageGallery/ImageGallery';
+import Button from 'Components/Button/Button';
 
 class App extends Component {
   state = {
     imageQuery: '',
     page: 1,
+    totalPage: 1,
     imageArr: [],
   };
 
-  addImageQuery = imageQuerySearchbar => {
-    console.log('imageQuerySearchbar: ', imageQuerySearchbar);
+  componentDidUpdate(_, prevState) {
+    const { imageQuery, page } = this.state;
 
+    if (prevState.imageQuery !== imageQuery) {
+      this.setState({
+        page: 1,
+        totalPage: 1,
+      });
+      this.fetchImagesData();
+    }
+
+    if (page !== prevState.page) {
+      this.fetchImagesData();
+    }
+  }
+
+  addImageQuery = imageQuerySearchbar => {
     this.setState({
       imageQuery: imageQuerySearchbar,
     });
 
-    // const dataArr = this.getFFFFF();
-    // console.log('dataArr: ', dataArr);
-    // this.getFFFFF();
+    console.log('imageQuerySearchbar: ', imageQuerySearchbar);
   };
 
-  // async getFFFFF() {
-  //   const dataArr = await getImages(this.state.imageQuery, this.state.page);
-  //   // console.log('dataArr: ', dataArr);
-
-  //   this.setState({
-  //     imageArr: dataArr,
-  //   });
-  //   // return dataArr;
-  // }
-
-  fetchSSSSS() {
+  fetchImagesData() {
     const { imageQuery, page } = this.state;
 
-    getImages(imageQuery, page).then(images => {
-      this.setState({
-        imageArr: images,
-      });
+    getImagesApi(imageQuery, page).then(images => {
+      console.log('images: ', images);
+
+      if (page > 1) {
+        this.setState(prevState => ({
+          imageArr: [...prevState.imageArr, ...images.hits],
+        }));
+      } else {
+        this.setState({
+          imageArr: images.hits,
+          totalPage: Math.ceil(images.totalHits / 12),
+        });
+      }
     });
   }
 
+  loadMore = () => {
+    this.setState(prevState => ({
+      page: (prevState.page += 1),
+    }));
+  };
+
   render() {
-    // this.getFFFFF();
+    const { imageArr, totalPage, page } = this.state;
+
     console.log('new');
-    this.fetchSSSSS();
-    console.log(this.state.imageArr);
+    console.log(imageArr);
+    console.log('totalPage: ', totalPage);
+    console.log('page: ', page);
+
     return (
       <>
         <Searchbar submitForm={this.addImageQuery} />
         <Section>
-          <p>My new App</p>
+          <>
+            <ImageGallery imageArr={imageArr} />
+            {totalPage > 1 && totalPage > page && (
+              <Button BtnLoadMore={this.loadMore} />
+            )}
+          </>
         </Section>
       </>
     );

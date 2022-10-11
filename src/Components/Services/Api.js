@@ -1,6 +1,6 @@
 import axios from 'axios';
 
-async function getImages(searchQuery, page) {
+async function getImagesApi(searchQuery, page) {
   const APIKEY = '29155055-535eee12d1c19223bea048262';
   const URL = `https://pixabay.com/api/?key=${APIKEY}`;
 
@@ -11,7 +11,7 @@ async function getImages(searchQuery, page) {
   };
 
   try {
-    const response = await axios.get(`${URL}&q=${searchQuery}&=${page}`, {
+    const response = await axios.get(`${URL}&q=${searchQuery}&page=${page}`, {
       params,
     });
 
@@ -21,4 +21,4 @@ async function getImages(searchQuery, page) {
   }
 }
 
-export default getImages;
+export default getImagesApi;
