@@ -1,5 +1,4 @@
 import { Component } from 'react';
-import { ThreeDots } from 'react-loader-spinner';
 
 import getImagesApi from 'Services/Api';
 import Searchbar from 'Components/Searchbar/Searchbar';
@@ -7,6 +6,7 @@ import Section from 'Components/Section/Section';
 import ImageGallery from 'Components/ImageGallery/ImageGallery';
 import Button from 'Components/Button/Button';
 import ModalImage from 'Components/ModalImage/ModalImage';
+import Loader from 'Components/Loader/Loader';
 
 class App extends Component {
   state = {
@@ -71,7 +71,7 @@ class App extends Component {
 
   loadMore = () => {
     this.setState(prevState => ({
-      page: (prevState.page += 1),
+      page: prevState.page + 1,
     }));
   };
 
@@ -89,32 +89,10 @@ class App extends Component {
     return (
       <>
         <Searchbar submitForm={this.addImageQuery} />
-        {loading && (
-          <ThreeDots
-            height="80"
-            width="80"
-            radius="9"
-            color="#3f51b5"
-            ariaLabel="three-dots-loading"
-            wrapperStyle={{
-              position: 'fixed',
-              top: '0',
-              left: '0',
-              width: '100vw',
-              height: '100vh',
-              display: 'flex',
-              justifyContent: 'center',
-              alignItems: 'center',
-              backgroundColor: 'rgba(0, 0, 0, 0.5)',
-              zIndex: '1200',
-            }}
-            wrapperClassName=""
-            visible={true}
-          />
-        )}
         <Section>
           <>
             <ImageGallery imageArr={imageArr} showModal={this.showModal} />
+            {loading && <Loader />}
             {totalPage > 1 && totalPage > page && (
               <Button BtnLoadMore={this.loadMore} />
             )}
