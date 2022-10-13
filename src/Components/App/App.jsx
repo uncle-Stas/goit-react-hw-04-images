@@ -1,4 +1,4 @@
-import { Component } from 'react';
+import { useEffect, useState } from 'react';
 
 import getImagesApi from 'Services/Api';
 import Searchbar from 'Components/Searchbar/Searchbar';
@@ -8,106 +8,88 @@ import Button from 'Components/Button/Button';
 import ModalImage from 'Components/ModalImage/ModalImage';
 import Loader from 'Components/Loader/Loader';
 
-class App extends Component {
-  state = {
-    imageQuery: '',
-    page: 1,
-    totalPage: 1,
-    imageArr: [],
-    loading: false,
-    modal: null,
+function App() {
+  const [imageQuery, setImageQuery] = useState('');
+  const [page, setPage] = useState(1);
+  const [totalPage, setTotalPage] = useState(1);
+  const [imageArr, setImageArr] = useState([]);
+  const [loading, setLoading] = useState(false);
+  const [modal, setModal] = useState(null);
+
+  const addImageQuery = imageQuerySearchbar => {
+    setImageQuery(imageQuerySearchbar);
+    setPage(1);
   };
 
-  componentDidUpdate(_, prevState) {
-    const { imageQuery, page } = this.state;
+  useEffect(() => {
+    if (imageQuery) {
+      // console.log('imageQuery: ', imageQuery);
+      setLoading(true);
 
-    if (prevState.imageQuery !== imageQuery) {
-      this.setState({
-        page: 1,
-        totalPage: 1,
-      });
-      this.fetchImagesData();
-    }
+      setPage(1);
+      setTotalPage(1);
 
-    if (page !== prevState.page) {
-      this.fetchImagesData();
-    }
-  }
-
-  addImageQuery = imageQuerySearchbar => {
-    this.setState({
-      imageQuery: imageQuerySearchbar,
-      page: 1,
-    });
-  };
-
-  fetchImagesData() {
-    const { imageQuery, page } = this.state;
-
-    this.setState({
-      loading: true,
-    });
-
-    getImagesApi(imageQuery, page)
-      .then(images => {
-        if (page > 1) {
-          this.setState(prevState => ({
-            imageArr: [...prevState.imageArr, ...images.hits],
-          }));
-        } else {
-          this.setState({
-            imageArr: images.hits,
-            totalPage: Math.ceil(images.totalHits / 12),
-          });
-        }
-      })
-      .catch(error => console.log(error.code))
-      .finally(() => {
-        this.setState({
-          loading: false,
+      getImagesApi(imageQuery, page)
+        .then(images => {
+          setImageArr(images.hits);
+          setTotalPage(Math.ceil(images.totalHits / 12));
+        })
+        .catch(error => console.log(error.code))
+        .finally(() => {
+          setLoading(false);
         });
-      });
-  }
+    }
+  }, [imageQuery]);
 
-  loadMore = () => {
-    this.setState(prevState => ({
-      page: prevState.page + 1,
-    }));
+  useEffect(() => {
+    if (page > 1) {
+      // console.log('page: ', page);
+      setLoading(true);
+
+      getImagesApi(imageQuery, page)
+        .then(images => {
+          setImageArr(prev => [...prev, ...images.hits]);
+        })
+        .catch(error => console.log(error.code))
+        .finally(() => {
+          setLoading(false);
+        });
+    }
+  }, [page]);
+
+  const loadMore = () => {
+    setPage(prev => prev + 1);
   };
 
-  showModal = modalImage => {
-    this.setState({ modal: modalImage });
+  const showModal = modalImage => {
+    setModal(modalImage);
   };
 
-  closeModal = () => {
-    this.setState({ modal: null });
+  const closeModal = () => {
+    setModal(null);
   };
 
-  render() {
-    const { imageArr, totalPage, page, loading, modal } = this.state;
-
-    return (
-      <>
-        <Searchbar submitForm={this.addImageQuery} />
-        <Section>
-          <>
-            <ImageGallery imageArr={imageArr} showModal={this.showModal} />
-            {loading && <Loader />}
-            {totalPage > 1 && totalPage > page && (
-              <Button BtnLoadMore={this.loadMore} />
-            )}
-          </>
-        </Section>
-        {modal && (
-          <ModalImage
-            closeModal={this.closeModal}
-            imageURL={modal.largeImageURL}
-            imageAlt={modal.tags}
-          />
-        )}
-      </>
-    );
-  }
+  return (
+    <>
+      <Searchbar submitForm={addImageQuery} />
+      <Section>
+        <>
+          <ImageGallery imageArr={imageArr} showModal={showModal} />
+          {loading && <Loader />}
+          {totalPage > 1 && totalPage > page && (
+            <Button BtnLoadMore={loadMore} />
+          )}
+        </>
+      </Section>
+      {modal && (
+        <ModalImage
+          closeModal={closeModal}
+          imageURL={modal.largeImageURL}
+          imageAlt={modal.tags}
+        />
+      )}
+    </>
+  );
 }
 
 export default App;
