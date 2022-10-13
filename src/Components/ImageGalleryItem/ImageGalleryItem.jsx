@@ -23,6 +23,10 @@ export default ImageGalleryItem;
 // --------------------------- PropTypes ----------------------
 
 ImageGalleryItem.propTypes = {
-  image: PropTypes.object.isRequired,
+  image: PropTypes.shape({
+    webformatURL: PropTypes.string.isRequired,
+    tags: PropTypes.string.isRequired,
+    id: PropTypes.number.isRequired,
+  }),
   imageClick: PropTypes.func.isRequired,
 };

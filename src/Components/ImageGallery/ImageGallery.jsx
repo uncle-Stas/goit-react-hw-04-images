@@ -25,6 +25,12 @@ export default ImageGallery;
 // --------------------------- PropTypes ----------------------
 
 ImageGallery.propTypes = {
-  imageArr: PropTypes.array.isRequired,
+  imageArr: PropTypes.arrayOf(
+    PropTypes.shape({
+      webformatURL: PropTypes.string.isRequired,
+      tags: PropTypes.string.isRequired,
+      id: PropTypes.number.isRequired,
+    })
+  ),
   showModal: PropTypes.func.isRequired,
 };
